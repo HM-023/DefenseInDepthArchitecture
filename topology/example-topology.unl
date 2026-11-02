@@ -1,0 +1,61 @@
+<?xml version='1.0' encoding='utf-8'?>
+<lab name="Generic Layered Security Reference" version="1" scripttimeout="300" lock="0">
+  <topology>
+    <nodes>
+      <node id="1" name="EDGE-A" type="iol" template="iol" image="REPLACE_WITH_LICENSED_IOL_IMAGE.bin" ethernet="2" console="telnet" delay="0" icon="Router.png" config="0" left="120" top="100" nvram="1024" ram="512" serial="0">
+        <interface id="0" name="e0/0" type="ethernet" network_id="1" />
+        <interface id="1" name="e0/1" type="ethernet" network_id="2" />
+        <interface id="2" name="e0/2" type="ethernet" network_id="3" />
+        <interface id="3" name="e0/3" type="ethernet" network_id="7" />
+        <interface id="4" name="e1/0" type="ethernet" network_id="9" />
+      </node>
+      <node id="2" name="CORE-A" type="iol" template="iol" image="REPLACE_WITH_LICENSED_IOL_IMAGE.bin" ethernet="2" console="telnet" delay="0" icon="Router.png" config="0" left="340" top="100" nvram="1024" ram="512" serial="0">
+        <interface id="0" name="e0/0" type="ethernet" network_id="2" />
+        <interface id="1" name="e0/1" type="ethernet" network_id="4" />
+        <interface id="2" name="e0/2" type="ethernet" network_id="5" />
+        <interface id="3" name="e0/3" type="ethernet" network_id="6" />
+      </node>
+      <node id="3" name="MGMT-A" type="vpcs" template="vpcs" image="" ethernet="1" console="telnet" delay="0" icon="VPCS.png" config="0" left="560" top="100">
+        <interface id="0" name="eth0" type="ethernet" network_id="4" />
+      </node>
+      <node id="4" name="USER-A" type="vpcs" template="vpcs" image="" ethernet="1" console="telnet" delay="0" icon="VPCS.png" config="0" left="780" top="100">
+        <interface id="0" name="eth0" type="ethernet" network_id="5" />
+      </node>
+      <node id="5" name="DMZ-A" type="vpcs" template="vpcs" image="" ethernet="1" console="telnet" delay="0" icon="VPCS.png" config="0" left="120" top="280">
+        <interface id="0" name="eth0" type="ethernet" network_id="3" />
+      </node>
+      <node id="6" name="LOG-A" type="vpcs" template="vpcs" image="" ethernet="1" console="telnet" delay="0" icon="VPCS.png" config="0" left="340" top="280">
+        <interface id="0" name="eth0" type="ethernet" network_id="6" />
+      </node>
+      <node id="7" name="BRANCH-B" type="iol" template="iol" image="REPLACE_WITH_LICENSED_IOL_IMAGE.bin" ethernet="2" console="telnet" delay="0" icon="Router.png" config="0" left="560" top="280" nvram="1024" ram="512" serial="0">
+        <interface id="0" name="e0/0" type="ethernet" network_id="7" />
+        <interface id="1" name="e0/1" type="ethernet" network_id="8" />
+      </node>
+      <node id="8" name="USER-B" type="vpcs" template="vpcs" image="" ethernet="1" console="telnet" delay="0" icon="VPCS.png" config="0" left="780" top="280">
+        <interface id="0" name="eth0" type="ethernet" network_id="8" />
+      </node>
+      <node id="9" name="BRANCH-C" type="iol" template="iol" image="REPLACE_WITH_LICENSED_IOL_IMAGE.bin" ethernet="2" console="telnet" delay="0" icon="Router.png" config="0" left="120" top="460" nvram="1024" ram="512" serial="0">
+        <interface id="0" name="e0/0" type="ethernet" network_id="9" />
+        <interface id="1" name="e0/1" type="ethernet" network_id="10" />
+      </node>
+      <node id="10" name="USER-C" type="vpcs" template="vpcs" image="" ethernet="1" console="telnet" delay="0" icon="VPCS.png" config="0" left="340" top="460">
+        <interface id="0" name="eth0" type="ethernet" network_id="10" />
+      </node>
+      <node id="11" name="EXTERNAL-TEST" type="vpcs" template="vpcs" image="" ethernet="1" console="telnet" delay="0" icon="VPCS.png" config="0" left="560" top="460">
+        <interface id="0" name="eth0" type="ethernet" network_id="1" />
+      </node>
+    </nodes>
+    <networks>
+      <network id="1" type="bridge" name="external-test" left="0" top="0" visibility="0" />
+      <network id="2" type="bridge" name="internal-transit" left="0" top="0" visibility="0" />
+      <network id="3" type="bridge" name="dmz" left="0" top="0" visibility="0" />
+      <network id="4" type="bridge" name="management" left="0" top="0" visibility="0" />
+      <network id="5" type="bridge" name="users-a" left="0" top="0" visibility="0" />
+      <network id="6" type="bridge" name="logging" left="0" top="0" visibility="0" />
+      <network id="7" type="bridge" name="wan-b" left="0" top="0" visibility="0" />
+      <network id="8" type="bridge" name="users-b" left="0" top="0" visibility="0" />
+      <network id="9" type="bridge" name="wan-c" left="0" top="0" visibility="0" />
+      <network id="10" type="bridge" name="users-c" left="0" top="0" visibility="0" />
+    </networks>
+  </topology>
+</lab>

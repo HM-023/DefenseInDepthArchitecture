@@ -1,0 +1,149 @@
+{
+  "provenance": "New generic illustrative layout; not an export or redaction of the original shared lab.",
+  "node_count": 11,
+  "network_objects": 10,
+  "interface_count": 20,
+  "virtualization_counts": {
+    "iol": 4,
+    "vpcs": 7
+  },
+  "nodes": [
+    {
+      "id": "1",
+      "name": "EDGE-A",
+      "type": "iol"
+    },
+    {
+      "id": "2",
+      "name": "CORE-A",
+      "type": "iol"
+    },
+    {
+      "id": "3",
+      "name": "MGMT-A",
+      "type": "vpcs"
+    },
+    {
+      "id": "4",
+      "name": "USER-A",
+      "type": "vpcs"
+    },
+    {
+      "id": "5",
+      "name": "DMZ-A",
+      "type": "vpcs"
+    },
+    {
+      "id": "6",
+      "name": "LOG-A",
+      "type": "vpcs"
+    },
+    {
+      "id": "7",
+      "name": "BRANCH-B",
+      "type": "iol"
+    },
+    {
+      "id": "8",
+      "name": "USER-B",
+      "type": "vpcs"
+    },
+    {
+      "id": "9",
+      "name": "BRANCH-C",
+      "type": "iol"
+    },
+    {
+      "id": "10",
+      "name": "USER-C",
+      "type": "vpcs"
+    },
+    {
+      "id": "11",
+      "name": "EXTERNAL-TEST",
+      "type": "vpcs"
+    }
+  ],
+  "links": [
+    {
+      "network_id": "1",
+      "name": "external-test",
+      "endpoints": [
+        "EDGE-A",
+        "EXTERNAL-TEST"
+      ]
+    },
+    {
+      "network_id": "2",
+      "name": "internal-transit",
+      "endpoints": [
+        "EDGE-A",
+        "CORE-A"
+      ]
+    },
+    {
+      "network_id": "3",
+      "name": "dmz",
+      "endpoints": [
+        "EDGE-A",
+        "DMZ-A"
+      ]
+    },
+    {
+      "network_id": "4",
+      "name": "management",
+      "endpoints": [
+        "CORE-A",
+        "MGMT-A"
+      ]
+    },
+    {
+      "network_id": "5",
+      "name": "users-a",
+      "endpoints": [
+        "CORE-A",
+        "USER-A"
+      ]
+    },
+    {
+      "network_id": "6",
+      "name": "logging",
+      "endpoints": [
+        "CORE-A",
+        "LOG-A"
+      ]
+    },
+    {
+      "network_id": "7",
+      "name": "wan-b",
+      "endpoints": [
+        "EDGE-A",
+        "BRANCH-B"
+      ]
+    },
+    {
+      "network_id": "8",
+      "name": "users-b",
+      "endpoints": [
+        "BRANCH-B",
+        "USER-B"
+      ]
+    },
+    {
+      "network_id": "9",
+      "name": "wan-c",
+      "endpoints": [
+        "EDGE-A",
+        "BRANCH-C"
+      ]
+    },
+    {
+      "network_id": "10",
+      "name": "users-c",
+      "endpoints": [
+        "BRANCH-C",
+        "USER-C"
+      ]
+    }
+  ]
+}
