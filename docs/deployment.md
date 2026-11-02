@@ -10,3 +10,7 @@ The included layout is a newly authored, fictional example with 11 nodes and 10 
 6. Collect independent allow/deny tests, route tables, log delivery and failure/recovery evidence.
 
 Routers and VPCS endpoints are placeholders for exploring segmentation. A VPCS endpoint is not a server or collector implementation. IPsec, IDS/IPS, AAA, HA and centralized logging remain design objectives; the layout does not implement them. This is not a one-command deployed lab.
+
+## Executed Validation
+
+The [hosted topology validation workflow](https://github.com/HM-023/DefenseInDepthArchitecture/actions/runs/41430658796) passed on 2026-11-02. It checks XML parsing, unique object IDs, network link references and inventory counts. Device boot, routing, security policy and simulator import remain unverified.
