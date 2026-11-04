@@ -8,6 +8,19 @@
 
 First-match evaluation over modeled zones, tcp/udp and ports with implicit default deny. The repository now includes a working, browser-based local workspace with a responsive dashboard and persistent records.
 
+## Workspace preview
+
+![Real desktop workspace capture using fictional or synthetic inputs](assets/workspace-preview.png)
+
+<details>
+<summary>Full desktop and mobile captures</summary>
+
+![Full desktop workspace](assets/workspace-desktop.png)
+
+<img src="assets/workspace-mobile.png" alt="Real mobile workspace capture at 390 pixels" width="390">
+
+</details>
+
 ## What you can do
 
 | Capability | Working behavior |
