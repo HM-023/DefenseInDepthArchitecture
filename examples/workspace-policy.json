@@ -1,0 +1,69 @@
+{
+  "name": "Segmented enterprise policy",
+  "zones": [
+    "internet",
+    "dmz",
+    "users",
+    "management",
+    "logging"
+  ],
+  "rules": [
+    {
+      "id": "P-01",
+      "source": "internet",
+      "destination": "dmz",
+      "protocol": "tcp",
+      "port": 443,
+      "action": "allow"
+    },
+    {
+      "id": "P-02",
+      "source": "users",
+      "destination": "dmz",
+      "protocol": "tcp",
+      "port": 443,
+      "action": "allow"
+    },
+    {
+      "id": "P-03",
+      "source": "management",
+      "destination": "any",
+      "protocol": "tcp",
+      "port": 22,
+      "action": "allow"
+    },
+    {
+      "id": "P-04",
+      "source": "any",
+      "destination": "logging",
+      "protocol": "udp",
+      "port": 514,
+      "action": "allow"
+    }
+  ],
+  "tests": [
+    {
+      "source": "internet",
+      "destination": "management",
+      "protocol": "tcp",
+      "port": 22,
+      "expected": "deny"
+    },
+    {
+      "source": "internet",
+      "destination": "dmz",
+      "protocol": "tcp",
+      "port": 443,
+      "expected": "allow"
+    },
+    {
+      "source": "users",
+      "destination": "management",
+      "protocol": "tcp",
+      "port": 3389,
+      "expected": "deny"
+    }
+  ],
+  "matrix_protocol": "tcp",
+  "matrix_port": 443
+}

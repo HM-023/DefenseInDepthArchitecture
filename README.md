@@ -2,36 +2,75 @@
 
 # Defense in Depth Architecture
 
-**Design + static reference layout** · [Portfolio](https://github.com/HM-023) · [Deployment](docs/deployment.md) · [Threat model](docs/threat-model.md) · [Control matrix](docs/security-controls.md)
+**Local policy analysis workspace** · [User guide](docs/workspace-guide.md) · [Architecture](docs/workspace-architecture.md) · [Verification](docs/workspace-verification.md) · [Portfolio](https://github.com/HM-023)
 
-[![Topology validation](https://github.com/HM-023/DefenseInDepthArchitecture/actions/workflows/validate-topology.yml/badge.svg)](https://github.com/HM-023/DefenseInDepthArchitecture/actions/workflows/validate-topology.yml)
+[![Workspace verification](https://github.com/HM-023/DefenseInDepthArchitecture/actions/workflows/workspace.yml/badge.svg)](https://github.com/HM-023/DefenseInDepthArchitecture/actions/workflows/workspace.yml)
 
+First-match evaluation over modeled zones, tcp/udp and ports with implicit default deny. The repository now includes a working, browser-based local workspace with a responsive dashboard and persistent records.
 
-A multi-site enterprise security architecture case study with a newly authored generic EVE-NG reference layout. The focus is on **layered controls and observable defensive outcomes**, not bypassing security controls.
+## What you can do
 
-## Reference layout
+| Capability | Working behavior |
+|:---|:---|
+| **Ordered rule engine** | First-match evaluation over modeled zones, tcp/udp and ports with implicit default deny. |
+| **Decision matrix** | Inspect inter-zone allow/deny results for a selected protocol and port. |
+| **Rule review** | Flag rules fully shadowed by an earlier rule and broad management-access patterns. |
+| **Executable assertions** | Declare expected flow decisions and inspect pass/fail results with the matching rule. |
+| **Saved policy analyses** | Persist full input policies, matrices, assertions and warnings in SQLite. |
+| **Reference layout** | Keep the original 11-node generic EVE-NG inventory and XML validator. |
 
-![Architecture overview](assets/architecture.svg)
+## Run locally
 
-## Security objectives
+Requires **Python 3.11+**. Run commands from this repository's root:
 
-- Separate untrusted, DMZ, internal, management, and branch networks
-- Design firewall rules based on explicit allowlists and least privilege
-- Protect inter-site communications with appropriately configured encrypted tunnels
-- Use centralized identity, logging, alert triage, and documented incident response
-- Plan high availability and validate how controls behave during failover
+```bash
+python -m venv .venv
+# Windows PowerShell: .venv\Scripts\Activate.ps1
+# macOS/Linux: source .venv/bin/activate
+python -m webapp.app
+```
 
-## Included artifacts
+Open **http://127.0.0.1:8103** in your browser. Stop the server with `Ctrl+C`.
 
-- `topology/example-topology.unl` — new fictional 11-node EVE-NG **layout**, requiring your own compatible image mapping
-- `topology/inventory.json` — machine-readable reference node and link inventory
-- `docs/security-controls.md` — controls-to-validation matrix
-- `docs/deployment.md` — prerequisites, design limitations, and reproducibility
-- `docs/threat-model.md` — attack surfaces and compensating controls
+Four workspaces use only Python's standard library. The ML workspace uses the packages in `requirements.txt`. The browser UI loads no external fonts, scripts, analytics or services. After dependencies are installed, the applications run offline.
 
-## Important limitations
+For a different local port or data directory:
 
-The EVE-NG layout is a newly authored generic example, statically checked but **not imported or executed**. Router image names are placeholders; it **contains no appliance firmware, boot images or device configurations**. The inventory lists topology objects, not proof of correct IDS, VPN, AAA, or firewall configuration. These technologies need working configurations, compatible licensed appliances, and independent testing before any implementation claim.
+```bash
+python -m webapp.app --port 8203 --data-dir path/to/local-workspace
+```
 
-No historical organization names, personal identifiers, assessment documents, or real deployment claims are included. The original shared topology and derived inventory remain private pending contribution and reuse permission checks.
+## Architecture
 
+![Local workspace architecture](assets/architecture.svg)
+
+The server binds to loopback, checks the Host header and requires a fresh per-process token for API access. Mutations also reject foreign browser origins. Local data lives under `data/` by default; database files, model files and generated outputs are excluded from version control.
+
+## Verify the implementation
+
+```bash
+python -m unittest discover -s tests -v
+```
+
+The [workspace workflow](https://github.com/HM-023/DefenseInDepthArchitecture/actions/workflows/workspace.yml) runs domain tests and an automated browser journey on GitHub. Browser runs upload real desktop and mobile captures as the **workspace-screenshots** artifact. See the verification document for the exact tested boundaries.
+
+## Implementation boundaries
+
+Policy reasoning is logical and zone-based. It does not simulate packets, install firewall rules, model stateful sessions or implement IDS, VPNs or routing. The EVE-NG layout still requires compatible images and device configurations.
+
+These are local portfolio applications, with documented scope and tested workflows. They are not deployed enterprise services. No synthetic model score is presented as a real-world detection benchmark, and no generated network diagram or policy decision is presented as live network evidence.
+
+## Repository map
+
+| Path | Purpose |
+|:---|:---|
+| `webapp/app.py` | Application actions and local workspace state |
+| `webapp/runtime.py` | Loopback HTTP boundary and SQLite document storage |
+| `webapp/static/` | Responsive dashboard, forms, tables, charts and exports |
+| `tests/` | Domain, persistence, server-boundary and browser checks |
+| `docs/workspace-guide.md` | Usage, input formats and local-data operations |
+| `docs/reference-case-study.md` | Prior case study, historical context and attribution |
+
+## Provenance and reuse
+
+The workspace code and generic examples are newly authored. Historical collaborative source materials, private datasets, credentials and organization-specific documents remain excluded. The [reference case study](docs/reference-case-study.md), [publication notes](PUBLICATION_NOTES.md) and existing security guidance retain the original contribution and reuse boundaries. No blanket license has been added to historical material.
