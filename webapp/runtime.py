@@ -4,6 +4,7 @@ import json
 import secrets
 import sqlite3
 import threading
+from contextlib import contextmanager
 from datetime import datetime, timezone
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
@@ -37,10 +38,15 @@ class Store:
         self.path=self.directory/'workspace.sqlite3'
         with self.connect() as db:
             db.execute('CREATE TABLE IF NOT EXISTS documents (id TEXT PRIMARY KEY, kind TEXT NOT NULL, payload TEXT NOT NULL, created TEXT NOT NULL)')
+    @contextmanager
     def connect(self):
         db=sqlite3.connect(self.path,timeout=15)
-        db.row_factory=sqlite3.Row;db.execute('PRAGMA foreign_keys=ON')
-        return db
+        try:
+            db.row_factory=sqlite3.Row;db.execute('PRAGMA foreign_keys=ON')
+            with db:
+                yield db
+        finally:
+            db.close()
     def all(self,kind):
         with self.connect() as db:
             rows=db.execute('SELECT payload FROM documents WHERE kind=? ORDER BY created DESC,id DESC',(kind,)).fetchall()

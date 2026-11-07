@@ -40,6 +40,34 @@ class RuntimeTests(unittest.TestCase):
         self.assertEqual(integer('12','Count'),12)
 
 class StoreTests(unittest.TestCase):
+    def test_connection_is_closed_after_context_exit(self):
+        import sqlite3
+        with tempfile.TemporaryDirectory() as d:
+            store = Store(d)
+            with store.connect() as db:
+                db.execute('SELECT 1')
+            try:
+                with self.assertRaises(sqlite3.ProgrammingError):
+                    db.execute('SELECT 1')
+            finally:
+                db.close()
+
+    def test_failed_transaction_rolls_back_and_releases_connection(self):
+        import sqlite3
+        with tempfile.TemporaryDirectory() as d:
+            store = Store(d)
+            with self.assertRaisesRegex(ValueError, 'cancel transaction'):
+                with store.connect() as db:
+                    db.execute('INSERT INTO documents VALUES (?,?,?,?)',
+                               ('cancelled', 'finding', '{}', '2026-11-08'))
+                    raise ValueError('cancel transaction')
+            try:
+                with self.assertRaises(sqlite3.ProgrammingError):
+                    db.execute('SELECT 1')
+            finally:
+                db.close()
+            self.assertEqual(store.all('finding'), [])
+
     def test_persistence_and_parameterized_identifier(self):
         with tempfile.TemporaryDirectory() as d:
             one=Store(d);one.save('finding',{'id':'abc','title':'test'})
