@@ -2,13 +2,13 @@
 
 ## Automated domain and boundary checks
 
-Run `python -m unittest discover -s tests -v` from the repository root. The suite contains 13 tests, including the shared HTTP boundary/storage checks. Domain checks cover the application's meaningful invariants, persistence across new workspace instances and invalid inputs. The volunteer suite includes competing assignment requests to verify capacity is enforced transactionally. The ML suite verifies group-disjoint and strictly ordered temporal splits, local artifact prediction and protocol comparison fingerprints.
+Run `python -m unittest discover -s tests -v` from the repository root. The suite contains 15 tests, including HTTP boundary and SQLite storage checks. Policy checks cover ordered first-match decisions, implicit deny, shadowed rules, invalid inputs and saved analyses.
 
 The implementation was exercised locally on 2026-11-04. Final hosted results are available in [Workspace verification](https://github.com/HM-023/DefenseInDepthArchitecture/actions/workflows/workspace.yml); inspect the commit associated with each run. The workflow additionally runs the browser journey and uploads desktop/mobile captures. A green unit-test job alone is not evidence that a browser job passed.
 
 ## Boundaries
 
-Unit tests and browser journeys verify the documented local workflows. They do not establish production readiness, real-traffic ML accuracy, actual firewall enforcement, simulator import compatibility, independent penetration-test findings or hosted multi-user behavior. The C# prototype, where present, has its separate Windows build check.
+These checks establish logical policy behavior, not live firewall enforcement, simulator import, encrypted tunnels or IDS/IPS operation.
 
 ## Browser journey
 
@@ -25,3 +25,11 @@ The application itself needs neither Node nor Playwright. These are verification
 ## Hosted release check
 
 On 2026-11-04, both the domain/unit job and browser workflow passed for the [local workspace release](https://github.com/HM-023/DefenseInDepthArchitecture/actions/runs/41802140103). The repository screenshots were captured by that successful browser journey. Use the workflow link above to inspect subsequent commits and results.
+
+## Local Windows check — 2026-11-08
+
+All 15 tests passed with Python 3.13.4 after fixing SQLite connection cleanup. The new regression checks verify that successful and failed transactions close their connections, and that failed writes roll back. Previously, transaction exit left connections open, which locked database files on Windows.
+
+The existing browser journey also passed locally on 2026-11-08 using Node 22.16.0, bundled Playwright 1.62.1 and the already-installed Chromium headless shell (revision 1243). A local runner supplied the browser executable path; repository tests and CI's pinned Playwright 1.56.1 configuration were unchanged. The journey exercised the app workflow, captured desktop/mobile views, checked viewport overflow and reloaded persisted state. Inputs were fictional or synthetic.
+
+These are local execution results. Historical hosted checks remain recorded above; subsequent hosted runs should be inspected against their commit.

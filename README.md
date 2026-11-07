@@ -1,89 +1,60 @@
-![Defense in Depth Architecture](assets/cover.svg)
-
 # Defense in Depth Architecture
 
-**Local policy analysis workspace** · [User guide](docs/workspace-guide.md) · [Architecture](docs/workspace-architecture.md) · [Verification](docs/workspace-verification.md) · [Portfolio](https://github.com/HM-023)
+A layered security design built around a concrete question: which zones should be able to reach which services? The repository pairs a reference network layout with a later policy analyzer that makes those expectations executable.
 
-[![Workspace verification](https://github.com/HM-023/DefenseInDepthArchitecture/actions/workflows/workspace.yml/badge.svg)](https://github.com/HM-023/DefenseInDepthArchitecture/actions/workflows/workspace.yml)
+**Security architecture · Segmentation · EVE-NG reference · Python**
 
-First-match evaluation over modeled zones, tcp/udp and ports with implicit default deny. The repository now includes a working, browser-based local workspace with a responsive dashboard and persistent records.
+[Threat model](docs/threat-model.md) · [Control matrix](docs/security-controls.md) · [Lab setup](docs/deployment.md) · [Example policy](examples/workspace-policy.json)
 
-## Workspace preview
+![Reference layout: external test host, headquarters edge and core, management, users, DMZ and logging endpoints, and two branches with user endpoints](assets/security-layout.svg)
 
-![Real desktop workspace capture using fictional or synthetic inputs](assets/workspace-preview.png)
+*Diagram follows the public 11-node inventory. Connections represent layout links, not verified security controls.*
 
-<details>
-<summary>Full desktop and mobile captures</summary>
+## Start with the boundaries
 
-![Full desktop workspace](assets/workspace-desktop.png)
+The [threat model](docs/threat-model.md) covers remote access, compromised endpoints, lateral movement and management exposure. The design uses separate user, management, DMZ and logging segments, with branch networks connected through the headquarters edge.
 
-<img src="assets/workspace-mobile.png" alt="Real mobile workspace capture at 390 pixels" width="390">
+The [control matrix](docs/security-controls.md) maps each proposed control to evidence: allow/deny records for firewall rules, reachability tests for segmentation, counters for encrypted tunnels, and measured downtime for failover.
 
-</details>
+The EVE-NG file is a **generic reference layout**, separate from the original collaborative lab. It contains placeholder image names and no device configurations. Compatible images, import, device boot and actual enforcement still need validation.
 
-## What you can do
+## Later extension: test the policy
 
-| Capability | Working behavior |
-|:---|:---|
-| **Ordered rule engine** | First-match evaluation over modeled zones, tcp/udp and ports with implicit default deny. |
-| **Decision matrix** | Inspect inter-zone allow/deny results for a selected protocol and port. |
-| **Rule review** | Flag rules fully shadowed by an earlier rule and broad management-access patterns. |
-| **Executable assertions** | Declare expected flow decisions and inspect pass/fail results with the matching rule. |
-| **Saved policy analyses** | Persist full input policies, matrices, assertions and warnings in SQLite. |
-| **Reference layout** | Keep the original 11-node generic EVE-NG inventory and XML validator. |
+The local Python analyzer evaluates ordered rules using first-match semantics and implicit default deny. It reports matching rule IDs, a zone access matrix, fully shadowed rules and some broad-access warnings.
 
-## Run locally
+The included [policy example](examples/workspace-policy.json) makes these assertions:
 
-Requires **Python 3.11+**. Run commands from this repository's root:
+| Flow | Expected decision | Matching rule |
+|---|---|---|
+| Internet → DMZ, TCP 443 | Allow | P-01 |
+| Internet → management, TCP 22 | Deny | Implicit default deny |
+| Users → management, TCP 3389 | Deny | Implicit default deny |
 
-```bash
-python -m venv .venv
-# Windows PowerShell: .venv\Scripts\Activate.ps1
-# macOS/Linux: source .venv/bin/activate
+Rule order matters: an earlier broad allow can make a later deny unreachable. The regression tests exercise that case. These are logical decisions over zones, protocols and ports; they do not model stateful sessions or deploy firewall rules.
+
+## Run the checks
+
+Requires Python 3.11+; no third-party Python packages.
+
+```powershell
+python topology/validate_topology.py
+python -m unittest discover -s tests -v
 python -m webapp.app
 ```
 
-Open **http://127.0.0.1:8103** in your browser. Stop the server with `Ctrl+C`.
+The topology checker validates XML IDs, link references and inventory counts. Open [localhost:8103](http://127.0.0.1:8103), load the reference policy and select **Analyze policy** to inspect the three assertions.
 
-Four workspaces use only Python's standard library. The ML workspace uses the packages in `requirements.txt`. The browser UI loads no external fonts, scripts, analytics or services. After dependencies are installed, the applications run offline.
+[Topology CI](https://github.com/HM-023/DefenseInDepthArchitecture/actions/workflows/validate-topology.yml) · [Application CI](https://github.com/HM-023/DefenseInDepthArchitecture/actions/workflows/workspace.yml)
 
-For a different local port or data directory:
+<details>
+<summary>Policy analyzer screenshot and documentation</summary>
 
-```bash
-python -m webapp.app --port 8203 --data-dir path/to/local-workspace
-```
+![Policy analyzer running the fictional segmented-network example](assets/workspace-preview.png)
 
-## Architecture
+[Analyzer guide](docs/workspace-guide.md) · [Implementation](docs/workspace-architecture.md) · [Verification scope](docs/workspace-verification.md)
 
-![Local workspace architecture](assets/architecture.svg)
+</details>
 
-The server binds to loopback, checks the Host header and requires a fresh per-process token for API access. Mutations also reject foreign browser origins. Local data lives under `data/` by default; database files, model files and generated outputs are excluded from version control.
+**Status:** static layout checks and logical policy analysis. IDS/IPS, IPsec, AAA, logging delivery and high availability remain design objectives, not implemented controls in this reference.
 
-## Verify the implementation
-
-```bash
-python -m unittest discover -s tests -v
-```
-
-The [workspace workflow](https://github.com/HM-023/DefenseInDepthArchitecture/actions/workflows/workspace.yml) runs domain tests and an automated browser journey on GitHub. Browser runs upload real desktop and mobile captures as the **workspace-screenshots** artifact. See the verification document for the exact tested boundaries.
-
-## Implementation boundaries
-
-Policy reasoning is logical and zone-based. It does not simulate packets, install firewall rules, model stateful sessions or implement IDS, VPNs or routing. The EVE-NG layout still requires compatible images and device configurations.
-
-These are local portfolio applications, with documented scope and tested workflows. They are not deployed enterprise services. No synthetic model score is presented as a real-world detection benchmark, and no generated network diagram or policy decision is presented as live network evidence.
-
-## Repository map
-
-| Path | Purpose |
-|:---|:---|
-| `webapp/app.py` | Application actions and local workspace state |
-| `webapp/runtime.py` | Loopback HTTP boundary and SQLite document storage |
-| `webapp/static/` | Responsive dashboard, forms, tables, charts and exports |
-| `tests/` | Domain, persistence, server-boundary and browser checks |
-| `docs/workspace-guide.md` | Usage, input formats and local-data operations |
-| `docs/reference-case-study.md` | Prior case study, historical context and attribution |
-
-## Provenance and reuse
-
-The workspace code and generic examples are newly authored. Historical collaborative source materials, private datasets, credentials and organization-specific documents remain excluded. The [reference case study](docs/reference-case-study.md), [publication notes](PUBLICATION_NOTES.md) and existing security guidance retain the original contribution and reuse boundaries. No blanket license has been added to historical material.
+[Project background](docs/reference-case-study.md) · [Publication notes](PUBLICATION_NOTES.md)
